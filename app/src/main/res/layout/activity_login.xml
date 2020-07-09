@@ -27,7 +27,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:importantForAutofill="no" />
+            android:importantForAutofill="no"
+            android:textStyle="bold"/>
 
         <EditText
             android:id="@+id/login_password"
@@ -43,7 +44,8 @@
             android:layout_marginTop="17dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:importantForAutofill="no" />
+            android:importantForAutofill="no"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/forget_password_link"

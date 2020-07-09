@@ -5,7 +5,7 @@
     <string name="contacts_frag">Contacts</string>
     <string name="groups_frag">Groups</string>
     <string name="conversations_frag">Conversations</string>
-    <string name="forget_password">Forget Password ?</string>
+    <string name="forget_password">Forgot Password ?</string>
     <string name="new_account">New account ?</string>
     <string name="sign_in">Sign in</string>
     <string name="password_hint">Password...</string>
