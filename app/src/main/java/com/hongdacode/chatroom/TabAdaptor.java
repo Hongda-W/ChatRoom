@@ -1,7 +1,13 @@
 package com.hongdacode.chatroom;
 
+import android.graphics.drawable.Drawable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -41,21 +47,22 @@ public class TabAdaptor extends FragmentPagerAdapter {
         return 3;
     }
 
-    @Nullable
-    @Override
-    public CharSequence getPageTitle(int position) {
-        switch (position){
-            case 0:
-                return "Conversations";
-
-            case 1:
-                return "Groups";
-
-            case 2:
-                return "Contacts";
-
-            default:
-                return null;
-        }
-    }
+//    @Nullable
+//    @Override
+//    public CharSequence getPageTitle(int position) {
+//
+//        switch (position){
+//            case 0:
+//                return "Conversations";
+//
+//            case 1:
+//                return "Groups";
+//
+//            case 2:
+//                return "Contacts";
+//
+//            default:
+//                return null;
+//        }
+//    }
 }

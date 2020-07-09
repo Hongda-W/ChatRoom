@@ -23,23 +23,30 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText mPassword, mConfirmPassword;
     private AutoCompleteTextView mUsername, mEmail;
     private TextView mAlreadyHaveAccount;
+
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabaseRef;
 
     private ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("ChatRoom", "in register page");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
         loadViews();
+
+        mAuth = FirebaseAuth.getInstance();
+        mProgress = new ProgressDialog(this);
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
         mAlreadyHaveAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,16 +59,16 @@ public class RegisterActivity extends AppCompatActivity {
         mConfirmPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if ( i==200 || i == EditorInfo.IME_NULL ){
-                    attemptRegistration();
-                    return true;
+                if (keyEvent == null || keyEvent.getAction() != KeyEvent.ACTION_DOWN){
+                    return false;
                 }
-                return false;
+
+                attemptRegistration();
+                return true;
             }
         });
 
 
-        mAuth = FirebaseAuth.getInstance();
     }
 
     private void loadViews() {
@@ -70,7 +77,6 @@ public class RegisterActivity extends AppCompatActivity {
         mPassword = findViewById(R.id.register_password);
         mConfirmPassword = findViewById(R.id.confirm_password);
         mAlreadyHaveAccount = findViewById(R.id.already_have_account);
-        mProgress = new ProgressDialog(this);
     }
 
     public void register(View view) {
@@ -88,7 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
         View focusView = null;
 
         if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
-            mPassword.setError("Password too short or doesn't match");
+            mPassword.setError("Password is short than 6 characters or doesn't match");
             focusView = mPassword;
             cancel = true;
         }
@@ -124,13 +130,16 @@ public class RegisterActivity extends AppCompatActivity {
                 if (!task.isSuccessful()){
                     showErrorDialog("Registration failed!");
                     String errorMessage = task.getException().toString();
-                    Toast.makeText(RegisterActivity.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
-                    progress.dismiss();
+                    Log.d("ChatRoom", errorMessage);
+                    Toast.makeText(RegisterActivity.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
                 } else {
-                    sendToLoginActivity();
+                    String userID = mAuth.getCurrentUser().getUid();
+                    mDatabaseRef.child("Users").child(userID).setValue("");
+
+                    sendToMainActivity();
                     Toast.makeText(RegisterActivity.this, "Registration was successful!", Toast.LENGTH_SHORT).show();
-                    progress.dismiss();
                 }
+                progress.dismiss();
             }
         });
     }
@@ -147,6 +156,13 @@ public class RegisterActivity extends AppCompatActivity {
     private void sendToLoginActivity() {
         Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
         startActivity(loginIntent);
+    }
+
+    private void sendToMainActivity() {
+        Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mainIntent);
+        finish();
     }
 
     private void showErrorDialog(String message){

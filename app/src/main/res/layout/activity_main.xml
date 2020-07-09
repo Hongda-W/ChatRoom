@@ -23,8 +23,7 @@
             android:id="@+id/mainTabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        </com.google.android.material.tabs.TabLayout>
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"></com.google.android.material.tabs.TabLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
