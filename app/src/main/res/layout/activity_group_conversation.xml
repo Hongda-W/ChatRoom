@@ -23,7 +23,7 @@
         android:id="@+id/group_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/group_conversation_bar_layout"
+        android:layout_below="@+id/appBarLayout"
         android:layout_above="@+id/buttons_linear_layout"
         >
 
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:textAllCaps="false"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:textColor="@android:color/background_dark"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
