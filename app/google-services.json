@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "953670940009",
+    "firebase_url": "https://chatroom-46989.firebaseio.com",
+    "project_id": "chatroom-46989",
+    "storage_bucket": "chatroom-46989.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953670940009:android:7129bfc5917bdc1396f9f8",
+        "android_client_info": {
+          "package_name": "com.hongdacode.chatroom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "953670940009-8gtadt8j0ouahmjk5pusoqjnsb7j2tcp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDePVl8KzGNZ0eHwbj2QZ_iFqC55aYH2qo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "953670940009-8gtadt8j0ouahmjk5pusoqjnsb7j2tcp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
