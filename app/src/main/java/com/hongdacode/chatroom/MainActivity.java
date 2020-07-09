@@ -58,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout = findViewById(R.id.mainTabs);
         mTabLayout.setupWithViewPager(mViewPager);
 
+        int[] myImageList = new int[]{R.drawable.conversation_frag, R.drawable.group_frag, R.drawable.contact_frag};
+        for (int i = 0; i < mTabLayout.getTabCount(); i++) {
+            mTabLayout.getTabAt(i).setIcon(myImageList[i]);
+        }
+
     }
 
     @Override
