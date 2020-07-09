@@ -36,6 +36,10 @@ public class TabAdaptor extends FragmentPagerAdapter {
                 ContactsFragment contactsFragment = new ContactsFragment();
                 return contactsFragment;
 
+            case 3:
+                FriendRequestFragment requestFragment = new FriendRequestFragment();
+                return requestFragment;
+
             default:
                 return null;
         }
@@ -44,7 +48,7 @@ public class TabAdaptor extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 
 //    @Nullable
