@@ -7,11 +7,15 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -52,6 +56,17 @@ public class LoginActivity extends AppCompatActivity {
                 attemptLoginUser();
             }
         });
+
+        mPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (keyEvent == null || keyEvent.getAction() != KeyEvent.ACTION_DOWN){
+                    return false;
+                }
+                attemptLoginUser();
+                return true;
+            }
+        });
     }
 
 
@@ -80,9 +95,9 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     finish();
                     sendToMainActivity();
+                    Toast.makeText(LoginActivity.this, "Welcome back!", Toast.LENGTH_SHORT).show();
                 } else{
                     showErrorDialog("There is problem signing in.");
-
                 }
                 mProgress.dismiss();
             }

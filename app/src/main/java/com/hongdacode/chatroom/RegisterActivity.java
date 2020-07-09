@@ -35,7 +35,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("ChatRoom", "in register page");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
@@ -52,11 +51,12 @@ public class RegisterActivity extends AppCompatActivity {
         mConfirmPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if ( i==200 || i == EditorInfo.IME_NULL ){
-                    attemptRegistration();
-                    return true;
+                if (keyEvent == null || keyEvent.getAction() != KeyEvent.ACTION_DOWN){
+                    return false;
                 }
-                return false;
+
+                attemptRegistration();
+                return true;
             }
         });
 
@@ -88,7 +88,7 @@ public class RegisterActivity extends AppCompatActivity {
         View focusView = null;
 
         if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
-            mPassword.setError("Password too short or doesn't match");
+            mPassword.setError("Password is short than 6 characters or doesn't match");
             focusView = mPassword;
             cancel = true;
         }
@@ -124,13 +124,13 @@ public class RegisterActivity extends AppCompatActivity {
                 if (!task.isSuccessful()){
                     showErrorDialog("Registration failed!");
                     String errorMessage = task.getException().toString();
-                    Toast.makeText(RegisterActivity.this, "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
-                    progress.dismiss();
+                    Log.d("ChatRoom", errorMessage);
+                    Toast.makeText(RegisterActivity.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
                 } else {
-                    sendToLoginActivity();
+                    sendToMainActivity();
                     Toast.makeText(RegisterActivity.this, "Registration was successful!", Toast.LENGTH_SHORT).show();
-                    progress.dismiss();
                 }
+                progress.dismiss();
             }
         });
     }
@@ -147,6 +147,11 @@ public class RegisterActivity extends AppCompatActivity {
     private void sendToLoginActivity() {
         Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
         startActivity(loginIntent);
+    }
+
+    private void sendToMainActivity() {
+        Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
+        startActivity(mainIntent);
     }
 
     private void showErrorDialog(String message){
