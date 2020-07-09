@@ -1,11 +1,14 @@
 package com.hongdacode.chatroom;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +22,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.HashMap;
 
@@ -33,6 +38,8 @@ public class SettingsActivity extends AppCompatActivity {
     private String mUserID;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseRef;
+
+    private static final int GALLERY = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +60,34 @@ public class SettingsActivity extends AppCompatActivity {
         });
         
         getUserDetail();
+
+        mProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent getFromLocalGallery = new Intent();
+                getFromLocalGallery.setAction(Intent.ACTION_GET_CONTENT);
+                getFromLocalGallery.setType("image/*");
+                startActivityForResult(getFromLocalGallery, GALLERY);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode==GALLERY && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+
+            CropImage.activity(imageUri)
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setAspectRatio(1,1)
+                    .start(this);
+        }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+        }
     }
 
     private void updateEdits() {
@@ -88,6 +123,7 @@ public class SettingsActivity extends AppCompatActivity {
         mUserBio = findViewById(R.id.edit_user_bio);
         mProfileImage = findViewById(R.id.edit_profile_image);
     }
+
 
     private void getUserDetail() {
         mDatabaseRef.child("Users").child(mUserID)
