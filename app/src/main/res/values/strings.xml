@@ -15,4 +15,6 @@
     <string name="confirm_password">Confirm Password ...</string>
     <string name="already_have_an_account">Already have an account?</string>
     <string name="user_bio_edit">Bio...</string>
+    <string name="type_a_message">Type a message</string>
+    <string name="send_message">Send</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.hongdacode.chatroom;
 
+import android.content.Intent;
 import android.icu.text.Edits;
 import android.os.Bundle;
 
@@ -9,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -49,6 +51,18 @@ public class GroupsFragment extends Fragment {
         loadViews();
 
         getDisplayGroups();
+
+
+        mGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String mGroupName = adapterView.getItemAtPosition(i).toString();
+
+                Intent groupConversationIntent = new Intent(getContext(), GroupConversationActivity.class);
+                groupConversationIntent.putExtra("GroupName", mGroupName);
+                startActivity(groupConversationIntent);
+            }
+        });
 
         return mFragView;
 
