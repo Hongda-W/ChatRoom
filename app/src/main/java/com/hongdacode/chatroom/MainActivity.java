@@ -57,11 +57,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendToLoginActivity() {
-        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(loginIntent);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -80,10 +75,20 @@ public class MainActivity extends AppCompatActivity {
             sendToLoginActivity();
         }
         else if (item.getItemId() == R.id.menu_settings) {
-
+            sendToSettingsActivity();
         }
         else if (item.getItemId() == R.id.menu_add_someone) {
         }
         return true;
+    }
+
+    private void sendToLoginActivity() {
+        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
+    }
+
+    private void sendToSettingsActivity() {
+        Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(settingsIntent);
     }
 }

@@ -14,4 +14,5 @@
     <string name="register_button">Register</string>
     <string name="confirm_password">Confirm Password ...</string>
     <string name="already_have_an_account">Already have an account?</string>
+    <string name="user_status_edit">User status...</string>
 </resources>

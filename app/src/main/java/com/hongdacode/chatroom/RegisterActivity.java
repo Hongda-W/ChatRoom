@@ -23,13 +23,17 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText mPassword, mConfirmPassword;
     private AutoCompleteTextView mUsername, mEmail;
     private TextView mAlreadyHaveAccount;
+
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabaseRef;
 
     private ProgressDialog mProgress;
 
@@ -39,6 +43,10 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         loadViews();
+
+        mAuth = FirebaseAuth.getInstance();
+        mProgress = new ProgressDialog(this);
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
         mAlreadyHaveAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +69,6 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
 
-        mAuth = FirebaseAuth.getInstance();
     }
 
     private void loadViews() {
@@ -70,7 +77,6 @@ public class RegisterActivity extends AppCompatActivity {
         mPassword = findViewById(R.id.register_password);
         mConfirmPassword = findViewById(R.id.confirm_password);
         mAlreadyHaveAccount = findViewById(R.id.already_have_account);
-        mProgress = new ProgressDialog(this);
     }
 
     public void register(View view) {
@@ -127,6 +133,9 @@ public class RegisterActivity extends AppCompatActivity {
                     Log.d("ChatRoom", errorMessage);
                     Toast.makeText(RegisterActivity.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
                 } else {
+                    String userID = mAuth.getCurrentUser().getUid();
+                    mDatabaseRef.child("Users").child(userID).setValue("");
+
                     sendToMainActivity();
                     Toast.makeText(RegisterActivity.this, "Registration was successful!", Toast.LENGTH_SHORT).show();
                 }

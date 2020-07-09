@@ -43,6 +43,9 @@ public class LoginActivity extends AppCompatActivity {
 
         loadViews();
 
+        mAuth = FirebaseAuth.getInstance();
+        mProgress = new ProgressDialog(this);
+
         mNewAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,15 +110,13 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void loadViews() {
+
         mLoginButton = findViewById(R.id.login_button);
         mEmail = findViewById(R.id.login_email);
         mPassword = findViewById(R.id.login_password);
         mForgotPassword = findViewById(R.id.forget_password_link);
         mNewAccount = findViewById(R.id.new_account_link);
 
-        mAuth = FirebaseAuth.getInstance();
-
-        mProgress = new ProgressDialog(this);
     }
 
     private void sendToMainActivity() {
