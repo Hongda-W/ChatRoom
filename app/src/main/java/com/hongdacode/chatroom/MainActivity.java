@@ -1,17 +1,22 @@
 package com.hongdacode.chatroom;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -103,13 +108,61 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.menu_logout) {
             mAuth.signOut();
             sendToLoginActivity();
-        }
-        else if (item.getItemId() == R.id.menu_settings) {
+
+        } else if (item.getItemId() == R.id.menu_new_group) {
+          createNewGroup();
+
+        } else if (item.getItemId() == R.id.menu_settings) {
             sendToSettingsActivity();
-        }
-        else if (item.getItemId() == R.id.menu_add_someone) {
+
+        } else if (item.getItemId() == R.id.menu_add_someone) {
+
+
         }
         return true;
+    }
+
+    private void createNewGroup() {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
+        alertBuilder.setTitle("Enter group name: ");
+
+        final EditText groupNameView = new EditText(MainActivity.this);
+        groupNameView.setHint("e.g. Group1");
+        alertBuilder.setView(groupNameView);
+
+        alertBuilder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String groupName = groupNameView.getText().toString();
+
+                if (groupName.equals("")){
+                    showErrorDialog("Group name cannot be empty");
+                } else {
+                    attemptNewGroup(groupName);
+                }
+            }
+        });
+
+        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+
+        alertBuilder.show();
+    }
+
+    private void attemptNewGroup(final String groupName) {
+        mDatabaseRef.child("Groups").child(groupName).setValue("")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Toast.makeText(MainActivity.this, groupName + " created sucessfully.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     private void sendToLoginActivity() {
@@ -124,5 +177,14 @@ public class MainActivity extends AppCompatActivity {
         settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(settingsIntent);
         finish();
+    }
+
+    private void showErrorDialog(String message){
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Error")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

@@ -8,6 +8,12 @@
     </item>
 
     <item
+        android:id="@+id/menu_new_group"
+        android:title="New group"
+        app:showAsAction="never">
+    </item>
+
+    <item
         android:id="@+id/menu_settings"
         android:title="Setting"
         app:showAsAction="never">
