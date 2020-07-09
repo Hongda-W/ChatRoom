@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">ChatRoom</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="contacts_frag">Contacts</string>
+    <string name="groups_frag">Groups</string>
+    <string name="conversations_frag">Conversations</string>
+    <string name="forget_password">Forgot Password ?</string>
+    <string name="new_account">New account ?</string>
+    <string name="sign_in">Sign in</string>
+    <string name="password_hint">Password...</string>
+    <string name="email_hint">Email</string>
+    <string name="register_username">Username</string>
+    <string name="register_button">Register</string>
+    <string name="confirm_password">Confirm Password ...</string>
+    <string name="already_have_an_account">Already have an account?</string>
 </resources>
