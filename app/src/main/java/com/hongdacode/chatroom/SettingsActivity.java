@@ -14,8 +14,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -48,6 +51,8 @@ public class SettingsActivity extends AppCompatActivity {
                 updateEdits();
             }
         });
+        
+        getUserDetail();
     }
 
     private void updateEdits() {
@@ -82,6 +87,38 @@ public class SettingsActivity extends AppCompatActivity {
         mUserName = findViewById(R.id.edit_user_name);
         mUserBio = findViewById(R.id.edit_user_bio);
         mProfileImage = findViewById(R.id.edit_profile_image);
+    }
+
+    private void getUserDetail() {
+        mDatabaseRef.child("Users").child(mUserID)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if ((snapshot.exists()) && (snapshot.hasChild("Username")) && (snapshot.hasChild("profile_image"))) {
+                            String outUserName = snapshot.child("Username").getValue().toString();
+                            String outUserBio = snapshot.child("UserBio").getValue().toString();
+                            String outUserImage = snapshot.child("UserImage").getValue().toString();
+
+                            mUserName.setText(outUserName);
+                            mUserBio.setText(outUserBio);
+                        } else if ((snapshot.exists()) && (snapshot.hasChild("Username"))) {
+                            String outUserName = snapshot.child("Username").getValue().toString();
+                            String outUserBio = snapshot.child("UserBio").getValue().toString();
+
+                            mUserName.setText(outUserName);
+                            mUserBio.setText(outUserBio);
+
+                        } else {
+                            showErrorDialog("Please add your account detail");
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void sendToMainActivity() {
