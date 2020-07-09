@@ -35,12 +35,12 @@
         android:layout_marginTop="10dp"/>
 
     <EditText
-        android:id="@+id/edit_user_status"
+        android:id="@+id/edit_user_bio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/edit_user_name"
         android:inputType="textMultiLine"
-        android:hint="@string/user_status_edit"
+        android:hint="@string/user_bio_edit"
         android:textAlignment="center"
         android:drawableStart="@drawable/user_status"
         android:textColor="@color/colorPrimary"
@@ -55,7 +55,7 @@
         android:id="@+id/edit_update_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/edit_user_status"
+        android:layout_below="@+id/edit_user_bio"
         android:text="Update"
         android:textSize="24sp"
         android:textAllCaps="true"
