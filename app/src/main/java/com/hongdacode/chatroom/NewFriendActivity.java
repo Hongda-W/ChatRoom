@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,12 +62,23 @@ public class NewFriendActivity extends AppCompatActivity {
         FirebaseRecyclerAdapter<Contacts, SearchFriendViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, SearchFriendViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull SearchFriendViewHolder holder, int position, @NonNull Contacts model) {
-                        Log.d("ChatRoom", model.getUsername() + " - " + model.getUserBio());
+                    protected void onBindViewHolder(@NonNull SearchFriendViewHolder holder, final int position, @NonNull Contacts model) {
                         holder.mUserName.setText(model.getUsername());
                         holder.mUserStatus.setText(model.getUserBio());
                         Picasso.get().load(model.getProfileImage()).placeholder(R.drawable
                         .profile_default).into(holder.mProfileImage);
+
+                        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                String peekUserID = getRef(position).getKey();
+
+                                Intent userProfileIntent = new Intent(NewFriendActivity.this, UserProfileActivity.class);
+                                userProfileIntent.putExtra("userID", peekUserID);
+                                startActivity(userProfileIntent);
+
+                            }
+                        });
                     }
 
                     @NonNull

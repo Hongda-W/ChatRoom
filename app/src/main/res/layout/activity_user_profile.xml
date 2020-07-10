@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserProfileActivity"
+    android:background="@drawable/user_profile_top">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/friend_profile_image"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:src="@drawable/profile_default"
+        />
+
+    <TextView
+        android:id="@+id/friend_profile_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/friend_profile_image"
+        android:text="User name"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="5dp"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textAllCaps="false"
+        android:textAlignment="center"/>
+
+    <TextView
+        android:id="@+id/friend_profile_bio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/friend_profile_username"
+        android:text="User bio"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="5dp"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textAllCaps="false"
+        android:textAlignment="center"/>
+
+    <Button
+        android:id="@+id/send_friend_request"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/friend_profile_bio"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="80dp"
+        android:background="@drawable/buttons"
+        android:textColor="@color/white"
+        android:text="Send request"
+        android:textStyle="bold"
+        android:textSize="25sp"
+        android:textAllCaps="false"
+        />
+
+
+</RelativeLayout>
