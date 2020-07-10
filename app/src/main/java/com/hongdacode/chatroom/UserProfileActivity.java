@@ -45,16 +45,17 @@ public class UserProfileActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        String outUserName = snapshot.child("Username").getValue().toString();
-                        String outUserBio = snapshot.child("UserBio").getValue().toString();
-                        if ( snapshot.hasChild("profileImage") ){
-                            String userImageURL = snapshot.child("profileImage").getValue().toString();
-                            Picasso.get().load(userImageURL).into(mImageView);
+                        if ( snapshot.exists() ){
+                            String outUserName = snapshot.child("Username").getValue().toString();
+                            String outUserBio = snapshot.child("UserBio").getValue().toString();
+                            if ( snapshot.hasChild("profileImage") ){
+                                String userImageURL = snapshot.child("profileImage").getValue().toString();
+                                Picasso.get().load(userImageURL).into(mImageView);
+                            }
+
+                            mUsername.setText(outUserName);
+                            mUserBio.setText(outUserBio);
                         }
-
-                        mUsername.setText(outUserName);
-                        mUserBio.setText(outUserBio);
-
                     }
 
                     @Override
