@@ -26,6 +26,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText mPassword, mConfirmPassword;
@@ -89,6 +91,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         String email = mEmail.getText().toString();
         String password = mPassword.getText().toString();
+        String username = mUsername.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -119,11 +122,11 @@ public class RegisterActivity extends AppCompatActivity {
             mProgress.show();
 
 
-            createFirebaseUser(email, password, mProgress);
+            createFirebaseUser(email, password, username, mProgress);
         }
     }
 
-    private void createFirebaseUser(String email, String password, final ProgressDialog progress) {
+    private void createFirebaseUser(String email, String password, final String username, final ProgressDialog progress) {
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -135,6 +138,23 @@ public class RegisterActivity extends AppCompatActivity {
                 } else {
                     String userID = mAuth.getCurrentUser().getUid();
                     mDatabaseRef.child("Users").child(userID).setValue("");
+
+                    HashMap<String, String> profileMap = new HashMap<>();
+                    profileMap.put("uid", userID);
+                    profileMap.put("Username", username);
+                    profileMap.put("UserBio", "");
+                    mDatabaseRef.child("Users").child(userID).setValue(profileMap)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        sendToMainActivity();
+                                    } else {
+                                        String message = task.getException().toString();
+                                        showErrorDialog(message);
+                                    }
+                                }
+                            });
 
                     sendToMainActivity();
                     Toast.makeText(RegisterActivity.this, "Registration was successful!", Toast.LENGTH_SHORT).show();

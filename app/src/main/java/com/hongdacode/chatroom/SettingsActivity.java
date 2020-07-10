@@ -194,20 +194,17 @@ public class SettingsActivity extends AppCompatActivity {
 
                             mUserName.setText(outUserName);
                             mUserBio.setText(outUserBio);
-
                             Picasso.get().load(outUserImage).into(mProfileImage);
 
 
                         } else if ((snapshot.exists()) && (snapshot.hasChild("Username"))) {
                             String outUserName = snapshot.child("Username").getValue().toString();
                             String outUserBio = snapshot.child("UserBio").getValue().toString();
-
                             mUserName.setText(outUserName);
                             mUserBio.setText(outUserBio);
 
                         } else {
                             showErrorDialog("Please add your account detail");
-
                         }
                     }
 

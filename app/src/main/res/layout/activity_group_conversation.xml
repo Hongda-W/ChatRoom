@@ -70,6 +70,7 @@
             android:imeActionLabel="Send"
             android:hint="@string/type_a_message"
             android:inputType="textCapSentences|textAutoCorrect"
+            android:textCursorDrawable="@drawable/color_cursor"
             android:gravity="center_horizontal"/>
 
         <ImageButton

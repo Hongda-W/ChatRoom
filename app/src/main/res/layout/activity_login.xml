@@ -28,6 +28,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:importantForAutofill="no"
+            android:textCursorDrawable="@drawable/color_cursor"
             android:textStyle="bold"/>
 
         <EditText
@@ -45,6 +46,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:importantForAutofill="no"
+            android:textCursorDrawable="@drawable/color_cursor"
             android:textStyle="bold"/>
 
         <TextView
