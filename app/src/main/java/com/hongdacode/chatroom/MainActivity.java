@@ -122,8 +122,7 @@ public class MainActivity extends AppCompatActivity {
             sendToSettingsActivity();
 
         } else if (item.getItemId() == R.id.menu_add_someone) {
-
-
+            sendToNewFriendActivity();
         }
         return true;
     }
@@ -181,6 +180,11 @@ public class MainActivity extends AppCompatActivity {
     private void sendToSettingsActivity() {
         Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(settingsIntent);
+    }
+
+    private void sendToNewFriendActivity() {
+        Intent newFriendIntent = new Intent(MainActivity.this, NewFriendActivity.class);
+        startActivity(newFriendIntent);
     }
 
     private void showErrorDialog(String message){
