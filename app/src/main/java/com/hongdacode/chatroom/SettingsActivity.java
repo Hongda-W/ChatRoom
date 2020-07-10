@@ -44,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText mUserName, mUserBio;
     private CircleImageView mProfileImage;
 
-    private String mUserID;
+    private String mUserID, userImageURL;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseRef;
     private StorageReference mImageRef;
@@ -122,6 +122,7 @@ public class SettingsActivity extends AppCompatActivity {
                             Toast.makeText(SettingsActivity.this, "Profile image updated successfully.", Toast.LENGTH_SHORT).show();
                             if (imageUri != null){
                                 String imageURL = imageUri.toString();
+
                                 mDatabaseRef.child("Users").child(mUserID).child("profileImage")
                                         .setValue(imageURL)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -158,6 +159,7 @@ public class SettingsActivity extends AppCompatActivity {
                 profileMap.put("uid", mUserID);
                 profileMap.put("Username", userName);
                 profileMap.put("UserBio", userBio);
+                profileMap.put("profileImage", userImageURL);
             mDatabaseRef.child("Users").child(mUserID).setValue(profileMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -190,11 +192,11 @@ public class SettingsActivity extends AppCompatActivity {
                         if ((snapshot.exists()) && (snapshot.hasChild("Username")) && (snapshot.hasChild("profileImage"))) {
                             String outUserName = snapshot.child("Username").getValue().toString();
                             String outUserBio = snapshot.child("UserBio").getValue().toString();
-                            String outUserImage = snapshot.child("profileImage").getValue().toString();
+                            userImageURL = snapshot.child("profileImage").getValue().toString();
 
                             mUserName.setText(outUserName);
                             mUserBio.setText(outUserBio);
-                            Picasso.get().load(outUserImage).into(mProfileImage);
+                            Picasso.get().load(userImageURL).into(mProfileImage);
 
 
                         } else if ((snapshot.exists()) && (snapshot.hasChild("Username"))) {
