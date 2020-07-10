@@ -46,6 +46,7 @@ public class NewFriendActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Search for friend");
+
     }
 
     @Override
@@ -72,8 +73,7 @@ public class NewFriendActivity extends AppCompatActivity {
                     @Override
                     public SearchFriendViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.users_layout, parent, false);
-                        SearchFriendViewHolder viewHolder = new SearchFriendViewHolder(view);
-                        return viewHolder;
+                        return new SearchFriendViewHolder(view);
                     }
                 };
 
