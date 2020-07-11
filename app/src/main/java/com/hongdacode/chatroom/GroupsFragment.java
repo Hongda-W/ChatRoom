@@ -21,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -90,6 +91,7 @@ public class GroupsFragment extends Fragment {
 
                 mStringList.clear();
                 mStringList.addAll(mSet);
+                Collections.sort(mStringList);
                 mArrayAdapter.notifyDataSetChanged();
             }
 
