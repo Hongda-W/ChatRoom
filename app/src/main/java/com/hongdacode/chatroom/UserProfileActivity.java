@@ -75,10 +75,6 @@ public class UserProfileActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
                     checkRequestStatus();
-                }else{
-                    if (requestStatus == null) {
-                        requestStatus = "no request";
-                    }
                 }
             }
 
@@ -113,23 +109,22 @@ public class UserProfileActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()){
-                            if ( snapshot.hasChild(userID)){
-                                if (requestStatus == null){
-                                    requestStatus = snapshot.child(userID).child("request").getValue().toString();
-                                }
-                                if (requestStatus.equals("sent")){
-                                    mSendRequestButton.setText("Cancel request");
-                                } else if (requestStatus.equals("received")){
-                                    mSendRequestButton.setText("Accept request");
+                        if (snapshot.exists() && snapshot.hasChild(userID)){
+                            if (requestStatus == null){
+                                requestStatus = snapshot.child(userID).child("request").getValue().toString();
+                            }
+                            if (requestStatus.equals("sent")){
+                                mSendRequestButton.setText("Cancel request");
+                            } else if (requestStatus.equals("received")){
+                                mSendRequestButton.setText("Accept request");
 
-                                    mMessageButton.setBackgroundColor(getResources().getColor(R.color.dark_pink));
-                                    mMessageButton.setVisibility(View.VISIBLE);
-                                    mMessageButton.setText("Decline request");// use message button to reject request
-                                }
+                                mMessageButton.setBackgroundColor(getResources().getColor(R.color.dark_pink));
+                                mMessageButton.setVisibility(View.VISIBLE);
+                                mMessageButton.setText("Decline request");// use message button to reject request
                             }
                         }
                     }
+
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
@@ -140,16 +135,16 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
     private void attemptFriendRequest() {
-        if (requestStatus.equals("no request") || requestStatus.equals("cancelled")){
+        if ( requestStatus==null ){
             sendFriendRequest();
         }
-        if (requestStatus.equals("sent")){
+        else if (requestStatus.equals("sent")){
             cancelFriendRequest();
         }
-        if (requestStatus.equals("received")){
+        else if (requestStatus.equals("received")){
             acceptFriendRequest();
         }
-        if (requestStatus.equals("done")){
+        else if (requestStatus.equals("done")){
             deleteFriend();
         }
     }
