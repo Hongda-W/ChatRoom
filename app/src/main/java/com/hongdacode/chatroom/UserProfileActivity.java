@@ -189,14 +189,12 @@ public class UserProfileActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-                            mDatabaseRef.child("Contacts").child(userID).child(myUserID).child("isFriend").setValue("pending");
                             mDatabaseRef.child("FriendRequest").child(userID).child(myUserID).child("request")
                                     .setValue("received")
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()){
-                                                mDatabaseRef.child("Contacts").child(myUserID).child(userID).child("isFriend").setValue("pending");
                                                 Toast.makeText(UserProfileActivity.this, "Friend request sent.", Toast.LENGTH_SHORT).show();
                                                 sendToMainActivity();
                                             }
