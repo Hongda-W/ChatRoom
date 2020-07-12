@@ -57,7 +57,7 @@ public class UserProfileActivity extends AppCompatActivity {
         mDatabaseRef.child("Contacts").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists() && snapshot.hasChild(userID) && !userID.equals(myUserID) &&
+                if (snapshot.exists() && snapshot.hasChild(userID) && !userID.equals(myUserID) && snapshot.child(userID).hasChild(myUserID) &&
                         snapshot.child(userID).child(myUserID).child("isFriend").getValue().toString().equals("true")) {
                     requestStatus = "done";
                     mSendRequestButton.setText("Delete friend");
