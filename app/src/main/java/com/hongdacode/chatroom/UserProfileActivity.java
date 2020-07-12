@@ -1,9 +1,12 @@
 package com.hongdacode.chatroom;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -145,7 +148,10 @@ public class UserProfileActivity extends AppCompatActivity {
             acceptFriendRequest();
         }
         else if (requestStatus.equals("done")){
-            deleteFriend();
+            AlertDialog myAlertDialog = AskOption();
+            myAlertDialog.show();
+            myAlertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLUE);
+            myAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
         }
     }
 
@@ -321,5 +327,33 @@ public class UserProfileActivity extends AppCompatActivity {
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
         finish();
+    }
+
+    private AlertDialog AskOption() {
+        AlertDialog myQuittingDialogBox = new AlertDialog.Builder(this)
+                // set message, title, and icon
+                .setTitle("Delete")
+                .setMessage("Are you sure you want to delete this contact ?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        deleteFriend();
+                        dialog.dismiss();
+                    }
+
+                })
+
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+
+                    }
+                })
+                .create();
+
+        return myQuittingDialogBox;
     }
 }
