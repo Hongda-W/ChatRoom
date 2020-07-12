@@ -192,7 +192,6 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void createChat(final String myUserID, final String theirUserID) {
-        // TODO: create chat for the two users on database
         conversationID = createTransactionID();
         mDatabaseReference.child("Conversations").getRef().addValueEventListener(new ValueEventListener() {
             @Override
