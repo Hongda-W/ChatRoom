@@ -80,7 +80,7 @@ public class NewFriendActivity extends AppCompatActivity {
 
         adapter = new FirebaseRecyclerAdapter<Contacts, SearchFriendViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull SearchFriendViewHolder holder, final int position, @NonNull Contacts model) {
+            protected void onBindViewHolder(@NonNull final SearchFriendViewHolder holder, final int position, @NonNull Contacts model) {
 
                 final String userID = getRef(position).getKey();
                 final Button acceptButton = holder.mAcceptButton;
@@ -90,79 +90,98 @@ public class NewFriendActivity extends AppCompatActivity {
                 holder.mUserStatus.setText(model.getUserBio());
                 Picasso.get().load(model.getProfileImage()).placeholder(R.drawable.profile_default).into(holder.mProfileImage);
 
-                FirebaseDatabase.getInstance().getReference().child("FriendRequest").child(myUserID)
+
+                FirebaseDatabase.getInstance().getReference().child("Contacts").child(myUserID)
                         .addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.exists() && snapshot.hasChild(userID)){
-                                    acceptButton.setVisibility(View.VISIBLE);
-                                    rejectButton.setVisibility(View.VISIBLE);
-                                    final String friendRequest = snapshot.child(userID).child("request").getValue().toString();
-                                    if (friendRequest.equals("sent")){
-                                        acceptButton.setText("Request sent");
-                                        rejectButton.setVisibility(View.INVISIBLE);
-                                    } else if (friendRequest.equals("received")) {
-                                        final DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
-                                        acceptButton.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                mDatabaseRef.child("FriendRequest").child(myUserID).child(userID)
-                                                        .removeValue()
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if (task.isSuccessful()){
-                                                                    mDatabaseRef.child("Contacts").child(myUserID).child(userID).child("isFriend").setValue("true");
-                                                                    mDatabaseRef.child("FriendRequest").child(userID).child(myUserID)
+                                if (snapshot.exists() && snapshot.hasChild(userID) && snapshot.child(userID).child("isFriend").getValue().toString().equals("true")){
+                                    RecyclerView.LayoutParams itemParams = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+                                    holder.itemView.setVisibility(View.GONE);
+                                    itemParams.height=0;
+                                    itemParams.width=0;
+                                }else{
+                                    FirebaseDatabase.getInstance().getReference().child("FriendRequest").child(myUserID)
+                                            .addValueEventListener(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if (snapshot.exists() && snapshot.hasChild(userID)){
+                                                        acceptButton.setVisibility(View.VISIBLE);
+                                                        rejectButton.setVisibility(View.VISIBLE);
+                                                        final String friendRequest = snapshot.child(userID).child("request").getValue().toString();
+                                                        if (friendRequest.equals("sent")){
+                                                            acceptButton.setText("Request sent");
+                                                            rejectButton.setVisibility(View.INVISIBLE);
+                                                        } else if (friendRequest.equals("received")) {
+                                                            final DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+                                                            acceptButton.setOnClickListener(new View.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(View view) {
+                                                                    mDatabaseRef.child("FriendRequest").child(myUserID).child(userID)
                                                                             .removeValue()
                                                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                 @Override
                                                                                 public void onComplete(@NonNull Task<Void> task) {
                                                                                     if (task.isSuccessful()){
-                                                                                        mDatabaseRef.child("Contacts").child(userID).child(myUserID).child("isFriend").setValue("true");
-                                                                                        Toast.makeText(NewFriendActivity.this, "Friend request accepted.", Toast.LENGTH_SHORT).show();
-                                                                                        Intent intent = getIntent();
-                                                                                        finish();
-                                                                                        startActivity(intent);
+                                                                                        mDatabaseRef.child("Contacts").child(myUserID).child(userID).child("isFriend").setValue("true");
+                                                                                        mDatabaseRef.child("FriendRequest").child(userID).child(myUserID)
+                                                                                                .removeValue()
+                                                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                    @Override
+                                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                                        if (task.isSuccessful()){
+                                                                                                            mDatabaseRef.child("Contacts").child(userID).child(myUserID).child("isFriend").setValue("true");
+                                                                                                            Toast.makeText(NewFriendActivity.this, "Friend request accepted.", Toast.LENGTH_SHORT).show();
+                                                                                                            Intent intent = getIntent();
+                                                                                                            finish();
+                                                                                                            startActivity(intent);
+                                                                                                        }
+                                                                                                    }
+                                                                                                });
                                                                                     }
                                                                                 }
                                                                             });
                                                                 }
-                                                            }
-                                                        });
-                                            }
-                                        });
+                                                            });
 
-                                        rejectButton.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                mDatabaseRef.child("FriendRequest").child(myUserID).child(userID)
-                                                        .removeValue()
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if (task.isSuccessful()){
-                                                                    mDatabaseRef.child("Contacts").child(myUserID).child(userID).removeValue();
-                                                                    mDatabaseRef.child("FriendRequest").child(userID).child(myUserID)
+                                                            rejectButton.setOnClickListener(new View.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(View view) {
+                                                                    mDatabaseRef.child("FriendRequest").child(myUserID).child(userID)
                                                                             .removeValue()
                                                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                 @Override
                                                                                 public void onComplete(@NonNull Task<Void> task) {
                                                                                     if (task.isSuccessful()){
-                                                                                        mDatabaseRef.child("Contacts").child(userID).child(myUserID).removeValue();
-                                                                                        Toast.makeText(NewFriendActivity.this, "Friend request rejected.", Toast.LENGTH_SHORT).show();
-                                                                                        Intent intent = getIntent();
-                                                                                        finish();
-                                                                                        startActivity(intent);
+                                                                                        mDatabaseRef.child("Contacts").child(myUserID).child(userID).removeValue();
+                                                                                        mDatabaseRef.child("FriendRequest").child(userID).child(myUserID)
+                                                                                                .removeValue()
+                                                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                    @Override
+                                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                                        if (task.isSuccessful()){
+                                                                                                            mDatabaseRef.child("Contacts").child(userID).child(myUserID).removeValue();
+                                                                                                            Toast.makeText(NewFriendActivity.this, "Friend request rejected.", Toast.LENGTH_SHORT).show();
+                                                                                                            Intent intent = getIntent();
+                                                                                                            finish();
+                                                                                                            startActivity(intent);
+                                                                                                        }
+                                                                                                    }
+                                                                                                });
                                                                                     }
                                                                                 }
                                                                             });
                                                                 }
-                                                            }
-                                                        });
-                                            }
-                                        });
-                                    }
+                                                            });
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
                                 }
                             }
 

@@ -191,7 +191,10 @@ public class FriendRequestFragment extends Fragment {
                                 });
                             }
                             else if (requestFriend.equals("sent")){
-                                holder.itemView.setVisibility(View.INVISIBLE);
+                                RecyclerView.LayoutParams itemParams = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+                                holder.itemView.setVisibility(View.GONE);
+                                itemParams.height=0;
+                                itemParams.width=0;
                             }
                         }
                     }
