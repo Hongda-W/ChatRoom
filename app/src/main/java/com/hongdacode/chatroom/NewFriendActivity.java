@@ -102,7 +102,6 @@ public class NewFriendActivity extends AppCompatActivity {
                                         acceptButton.setText("Request sent");
                                         rejectButton.setVisibility(View.INVISIBLE);
                                     } else if (friendRequest.equals("received")) {
-                                        Log.d("ChatRoom", "accept friend request button pressed");
                                         final DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference();
                                         acceptButton.setOnClickListener(new View.OnClickListener() {
                                             @Override
