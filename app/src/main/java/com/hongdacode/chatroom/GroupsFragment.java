@@ -1,5 +1,6 @@
 package com.hongdacode.chatroom;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.icu.text.Edits;
 import android.os.Bundle;
@@ -7,12 +8,16 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -65,13 +70,49 @@ public class GroupsFragment extends Fragment {
             }
         });
 
+//        mGroupListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                String mGroupName = adapterView.getItemAtPosition(i).toString();
+//                Log.d("ChatRoom", "Long clicked "+ mGroupName);
+//                return true;
+//            }
+//        });
+
         return mFragView;
 
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.group_list_view) {
+            getActivity().getMenuInflater().inflate(R.menu.menu_group_options, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        String groupName = (String) mGroupListView.getItemAtPosition(info.position);
+
+        switch (item.getItemId()) {
+            case R.id.option_rename:
+                Toast.makeText(getActivity(), "Rename "+groupName, Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.option_delete:
+                Toast.makeText(getActivity(), "Delete "+groupName, Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     private void loadViews() {
 
         mGroupListView = mFragView.findViewById(R.id.group_list_view);
+        registerForContextMenu(mGroupListView);
+
         mArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, mStringList);
         mGroupListView.setAdapter(mArrayAdapter);
 

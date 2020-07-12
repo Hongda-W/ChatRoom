@@ -208,6 +208,15 @@ public class FriendRequestFragment extends Fragment {
                 holder.mUserName.setText(model.getUsername());
                 holder.mUserStatus.setText(model.getUserBio());
                 Picasso.get().load(model.getProfileImage()).placeholder(R.drawable.profile_default).into(holder.mProfileImage);
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent userProfileIntent = new Intent(getContext(), UserProfileActivity.class);
+                        userProfileIntent.putExtra("userID", userID);
+                        startActivity(userProfileIntent);
+                    }
+                });
             }
         };
 
