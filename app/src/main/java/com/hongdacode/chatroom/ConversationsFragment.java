@@ -89,7 +89,6 @@ public class ConversationsFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()){
-                            Log.d("ChatRoom", "Sup: "+theirUserID);
                             mDatabaseRef.child("Users").child(theirUserID)
                                     .addValueEventListener(new ValueEventListener() {
                                         @Override
