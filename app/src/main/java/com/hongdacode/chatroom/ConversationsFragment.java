@@ -1,64 +1,158 @@
 package com.hongdacode.chatroom;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.renderscript.Sampler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ConversationsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ConversationsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private RecyclerView mRecyclerView;
+    private View mFragView;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDatabaseRef, mChatIndexRef;
+
+    private String myUserID;
+
 
     public ConversationsFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ChatsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ConversationsFragment newInstance(String param1, String param2) {
-        ConversationsFragment fragment = new ConversationsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_conversations, container, false);
+
+        mFragView = inflater.inflate(R.layout.fragment_conversations, container, false);
+
+        mRecyclerView = mFragView.findViewById(R.id.conversations_recycler);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        mChatIndexRef = mDatabaseRef.child("ConversationIndex");
+
+        mAuth = FirebaseAuth.getInstance();
+        myUserID = mAuth.getCurrentUser().getUid();
+
+        return mFragView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        FirebaseRecyclerOptions<Contacts> options =
+                new FirebaseRecyclerOptions.Builder<Contacts>()
+                        .setQuery(mChatIndexRef.child(myUserID), Contacts.class)
+                        .build();
+
+        FirebaseRecyclerAdapter<Contacts, ChatsViewHolder> adapter = new FirebaseRecyclerAdapter<Contacts, ChatsViewHolder> (options){
+
+            @NonNull
+            @Override
+            public ChatsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.users_layout, parent, false);
+                return new ChatsViewHolder(view);
+            }
+
+            @Override
+            protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull Contacts model) {
+                final String theirUserID = getRef(position).getKey();
+                DatabaseReference chatIDRef = getRef(position).child("id").getRef();
+
+                chatIDRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()){
+                            Log.d("ChatRoom", "Sup: "+theirUserID);
+                            mDatabaseRef.child("Users").child(theirUserID)
+                                    .addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.hasChild("profileImage")){
+                                                final String username = snapshot.child("Username").getValue().toString();
+                                                final String userBio = snapshot.child("UserBio").getValue().toString();
+                                                final String imageURL = snapshot.child("profileImage").getValue().toString();
+
+                                                holder.mUserName.setText(username);
+                                                holder.mUserStatus.setText(userBio);
+
+                                                Picasso.get().load(imageURL).into(holder.mProfileImage);
+                                            } else {
+                                                final String username = snapshot.child("Username").getValue().toString();
+                                                final String userBio = snapshot.child("UserBio").getValue().toString();
+
+                                                holder.mUserName.setText(username);
+                                                holder.mUserStatus.setText(userBio);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                        chatIntent.putExtra("theirUserID", theirUserID);
+                        startActivity(chatIntent);
+                    }
+                });
+
+            }
+        };
+
+        mRecyclerView.setAdapter(adapter);
+        adapter.startListening();
+    }
+
+    public static class ChatsViewHolder extends RecyclerView.ViewHolder{
+        TextView mUserName, mUserStatus;
+        CircleImageView mProfileImage;
+
+
+        public ChatsViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            mUserName = itemView.findViewById(R.id.user_name);
+            mUserStatus = itemView.findViewById(R.id.user_status);
+            mProfileImage = itemView.findViewById(R.id.user_image);
+        }
     }
 }
