@@ -123,6 +123,7 @@ public class ContactsFragment extends Fragment {
 
                     }
                 });
+
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

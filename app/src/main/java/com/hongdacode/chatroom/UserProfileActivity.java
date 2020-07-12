@@ -322,10 +322,9 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void sendToConversation() {
-        // TODO: modify this so that it redirects to the conversation activity
-        Intent mainIntent = new Intent(UserProfileActivity.this, MainActivity.class);
-        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(mainIntent);
+        Intent chatIntent = new Intent(UserProfileActivity.this, ChatActivity.class);
+        chatIntent.putExtra("theirUserID", userID);
+        startActivity(chatIntent);
         finish();
     }
 

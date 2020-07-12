@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()){
-                                        Toast.makeText(MainActivity.this, groupName + " created sucessfully.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MainActivity.this, groupName + " created successfully.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
