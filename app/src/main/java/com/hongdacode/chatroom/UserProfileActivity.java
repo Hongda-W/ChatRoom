@@ -334,7 +334,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 // set message, title, and icon
                 .setTitle("Delete")
                 .setMessage("Are you sure you want to delete this contact ?")
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(android.R.drawable.ic_delete)
 
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
 

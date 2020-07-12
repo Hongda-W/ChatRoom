@@ -1,11 +1,14 @@
 package com.hongdacode.chatroom;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.icu.text.Edits;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -70,15 +74,6 @@ public class GroupsFragment extends Fragment {
             }
         });
 
-//        mGroupListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//            @Override
-//            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                String mGroupName = adapterView.getItemAtPosition(i).toString();
-//                Log.d("ChatRoom", "Long clicked "+ mGroupName);
-//                return true;
-//            }
-//        });
-
         return mFragView;
 
     }
@@ -98,14 +93,102 @@ public class GroupsFragment extends Fragment {
 
         switch (item.getItemId()) {
             case R.id.option_rename:
-                Toast.makeText(getActivity(), "Rename "+groupName, Toast.LENGTH_SHORT).show();
+                renameGroup(groupName);
                 return true;
             case R.id.option_delete:
-                Toast.makeText(getActivity(), "Delete "+groupName, Toast.LENGTH_SHORT).show();
+                AlertDialog myAlertDialog = DeleteConfirmation(groupName);
+                myAlertDialog.show();
+                myAlertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLUE);
+                myAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
                 return true;
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private AlertDialog DeleteConfirmation(final String groupName) {
+        AlertDialog confirmationDialogBox = new AlertDialog.Builder(getActivity())
+                .setTitle("Delete")
+                .setMessage("Are you sure you want to delete this contact ?")
+                .setIcon(android.R.drawable.ic_delete)
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mDatabaseGroupRef.child(groupName).removeValue();
+                        Toast.makeText(getActivity(), "Group "+groupName+ " deleted.", Toast.LENGTH_SHORT).show();
+                        dialogInterface.dismiss();
+                    }
+                })
+
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+
+                .create();
+        return confirmationDialogBox;
+    }
+
+    private void renameGroup(final String groupName) {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity(), R.style.AlertDialog);
+        alertBuilder.setTitle("Enter group name: ");
+
+        final EditText groupNameView = new EditText(getActivity());
+        groupNameView.setHint(groupName);
+        alertBuilder.setView(groupNameView);
+
+        alertBuilder.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                final String newName = groupNameView.getText().toString();
+
+                if (groupName.equals("")){
+                    showErrorDialog("Group name cannot be empty");
+                } else {
+                    mDatabaseGroupRef.child(groupName).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()){
+                                 final Object tmpValue = snapshot.getValue();
+                                mDatabaseGroupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.hasChild(newName)){
+                                            showErrorDialog(newName + " already exists!");
+                                        } else{
+                                            mDatabaseGroupRef.child(newName).setValue(tmpValue);
+                                            mDatabaseGroupRef.child(groupName).removeValue();
+                                            Toast.makeText(getActivity(), "Renamed "+groupName+" to "+newName, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+            }
+        });
+
+        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+
+        alertBuilder.show();
     }
 
     private void loadViews() {
@@ -141,5 +224,14 @@ public class GroupsFragment extends Fragment {
 
             }
         });
+    }
+
+    private void showErrorDialog(String message){
+        new android.app.AlertDialog.Builder(getActivity())
+                .setTitle("Error")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, null)
+                .setIcon(android.R.drawable.stat_notify_error)
+                .show();
     }
 }

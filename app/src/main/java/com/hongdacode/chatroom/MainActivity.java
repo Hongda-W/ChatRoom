@@ -159,15 +159,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void attemptNewGroup(final String groupName) {
-        mDatabaseRef.child("Groups").child(groupName).setValue("")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Toast.makeText(MainActivity.this, groupName + " created sucessfully.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        mDatabaseRef.child("Groups").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.hasChild(groupName)){
+                    showErrorDialog(groupName + " already exists!");
+                }else {
+                    mDatabaseRef.child("Groups").child(groupName).setValue("")
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        Toast.makeText(MainActivity.this, groupName + " created sucessfully.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void sendToLoginActivity() {
