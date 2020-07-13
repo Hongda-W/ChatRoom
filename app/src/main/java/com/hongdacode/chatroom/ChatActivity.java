@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -26,21 +28,26 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 public class ChatActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private ImageButton mSendMessageButton;
-    private ScrollView mScrollView;
-    private TextView mTextView;
     private EditText mEditText;
 
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
+
+    private final List<Messages> mMessagesList = new ArrayList<>();
+    private LinearLayoutManager mLinearLayoutManager;
+    private MessageAdaptor mMessageAdaptor;
+    private RecyclerView mRecyclerView;
 
     private String conversationID, myUserID, myUsername, theirUserID, currentTime;
 
@@ -50,6 +57,13 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         loadViews();
+
+        mMessageAdaptor = new MessageAdaptor(mMessagesList);
+        mRecyclerView = findViewById(R.id.chat_recycler_view);
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setAdapter(mMessageAdaptor);
+
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
@@ -153,16 +167,15 @@ public class ChatActivity extends AppCompatActivity {
                     mDatabaseReference.child("Conversations").child(convID).addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                            if (snapshot.exists()){
-                                displayMessages(snapshot);
-                            }
+                            Messages message = snapshot.getValue(Messages.class);
+
+                            mMessagesList.add(message);
+
+                            mMessageAdaptor.notifyDataSetChanged();
                         }
 
                         @Override
                         public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                            if (snapshot.exists()){
-                                displayMessages(snapshot);
-                            }
 
                         }
 
@@ -220,8 +233,6 @@ public class ChatActivity extends AppCompatActivity {
         mSendMessageButton = findViewById(R.id.send_chat_message);
         mEditText = findViewById(R.id.chat_message_input);
 
-        mTextView = findViewById(R.id.chat_text);
-        mScrollView = findViewById(R.id.chat_scroll_view);
     }
 
     private void getUserInfo() {
@@ -254,28 +265,14 @@ public class ChatActivity extends AppCompatActivity {
             mDatabaseReference.child("Conversations").child(convID).updateChildren(messageMap);
 
             HashMap<String, Object> messageDetail = new HashMap<>();
-            messageDetail.put("Username", myUsername);
+            messageDetail.put("UserID", myUserID);
             messageDetail.put("message", messageInput);
             messageDetail.put("Time", currentTime);
+            messageDetail.put("type", "text");
             mDatabaseReference.child("Conversations").child(convID).child(messageKey).updateChildren(messageDetail);
         }
 
         mEditText.setText("");
     }
 
-    private void displayMessages(DataSnapshot snapshot) {
-
-        Iterator ite = snapshot.getChildren().iterator();
-
-        while (ite.hasNext()){
-            String timeStamp = ((DataSnapshot)ite.next()).getValue().toString();
-            String userName = ((DataSnapshot)ite.next()).getValue().toString();
-            String message = ((DataSnapshot)ite.next()).getValue().toString();
-
-            mTextView.append(userName + ":\n" + message + "\n" + timeStamp + "\n\n\n");
-
-            mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-        }
-        return;
-    }
 }
