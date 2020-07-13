@@ -88,15 +88,15 @@ public class MessageAdaptor extends RecyclerView.Adapter<MessageAdaptor.MessageV
         if (fromMessageType.equals("text")){
             holder.receiverMessageText.setVisibility(View.INVISIBLE);
             holder.receiverProfileImage.setVisibility(View.INVISIBLE);
+            holder.senderMessageText.setVisibility(View.INVISIBLE);
 
             if (messageFromID.equals(senderID)){
+                holder.senderMessageText.setVisibility(View.VISIBLE);
                 holder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
                 holder.senderMessageText.setTextColor(Color.BLACK);
                 holder.senderMessageText.setText(message);
 
             } else{
-                holder.senderMessageText.setVisibility(View.INVISIBLE);
-
                 holder.receiverProfileImage.setVisibility(View.VISIBLE);
                 holder.receiverMessageText.setVisibility(View.VISIBLE);
 

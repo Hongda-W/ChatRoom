@@ -172,6 +172,8 @@ public class ChatActivity extends AppCompatActivity {
                             mMessagesList.add(message);
 
                             mMessageAdaptor.notifyDataSetChanged();
+
+                            mRecyclerView.smoothScrollToPosition(mRecyclerView.getAdapter().getItemCount());
                         }
 
                         @Override
