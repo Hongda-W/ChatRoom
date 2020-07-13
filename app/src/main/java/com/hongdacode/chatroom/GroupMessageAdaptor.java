@@ -21,22 +21,22 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MessageAdaptor extends RecyclerView.Adapter<MessageAdaptor.MessageViewHolder> {
+public class GroupMessageAdaptor extends RecyclerView.Adapter<GroupMessageAdaptor.GroupMessageViewHolder> {
 
     private List<Messages> mMessagesList;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReference;
 
-    public MessageAdaptor (List<Messages> mMessagesList){
+    public GroupMessageAdaptor (List<Messages> mMessagesList){
         this.mMessagesList = mMessagesList;
     }
 
-    public class MessageViewHolder extends RecyclerView.ViewHolder{
+    public class GroupMessageViewHolder extends RecyclerView.ViewHolder{
 
         public TextView senderMessageText, receiverMessageText, receiverUsername;
         public CircleImageView receiverProfileImage, senderProfileImage;
 
-        public MessageViewHolder(@NonNull View itemView){
+        public GroupMessageViewHolder(@NonNull View itemView){
             super(itemView);
 
             senderMessageText = itemView.findViewById(R.id.sender_message_text);
@@ -50,18 +50,18 @@ public class MessageAdaptor extends RecyclerView.Adapter<MessageAdaptor.MessageV
 
     @NonNull
     @Override
-    public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public GroupMessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.message_layout, parent, false);
 
         mAuth = FirebaseAuth.getInstance();
 
-        return new MessageViewHolder(view);
+        return new GroupMessageViewHolder(view);
     }
 
 
     @Override
-    public void onBindViewHolder(@NonNull final MessageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final GroupMessageViewHolder holder, int position) {
         String senderID = mAuth.getCurrentUser().getUid();
         Messages messages = mMessagesList.get(position);
 
@@ -122,6 +122,7 @@ public class MessageAdaptor extends RecyclerView.Adapter<MessageAdaptor.MessageV
                 holder.receiverProfileImage.setVisibility(View.VISIBLE);
                 holder.receiverMessageText.setVisibility(View.VISIBLE);
                 holder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
+                holder.receiverUsername.setVisibility(View.VISIBLE);
                 holder.receiverMessageText.setTextColor(Color.BLACK);
                 holder.receiverMessageText.setText(message);
             }

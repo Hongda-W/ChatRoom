@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -23,21 +25,27 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.security.acl.Group;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class GroupConversationActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private ImageButton mSendMessageButton;
     private EditText mMessageView;
-    private ScrollView mScrollView;
-    private TextView mTextView;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseRef;
+
+    private final List<Messages> mMessagesList = new ArrayList<>();
+    private LinearLayoutManager mLinearLayoutManager;
+    private GroupMessageAdaptor mMessageAdaptor;
+    private RecyclerView mRecyclerView;
 
     private String mGroupName, mUserID, mUsername, currentTime;
 
@@ -48,6 +56,12 @@ public class GroupConversationActivity extends AppCompatActivity {
 
         mGroupName = getIntent().getStringExtra("GroupName");
         Toast.makeText(GroupConversationActivity.this, mGroupName, Toast.LENGTH_SHORT).show();
+
+        mMessageAdaptor = new GroupMessageAdaptor(mMessagesList);
+        mRecyclerView = findViewById(R.id.group_conv_recycler_view);
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mRecyclerView.setAdapter(mMessageAdaptor);
 
         mAuth = FirebaseAuth.getInstance();
         mUserID = mAuth.getCurrentUser().getUid();
@@ -80,20 +94,22 @@ public class GroupConversationActivity extends AppCompatActivity {
 
         super.onStart();
 
+
         mDatabaseRef.child("Groups").child(mGroupName).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if (snapshot.exists()){
-                    displayMessages(snapshot);
-                }
+                Messages message = snapshot.getValue(Messages.class);
+
+                mMessagesList.add(message);
+
+                mMessageAdaptor.notifyDataSetChanged();
+
+                mRecyclerView.smoothScrollToPosition(mRecyclerView.getAdapter().getItemCount());
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                if (snapshot.exists()){
-                    displayMessages(snapshot);
-                }
             }
 
             @Override
@@ -140,9 +156,6 @@ public class GroupConversationActivity extends AppCompatActivity {
         mSendMessageButton = findViewById(R.id.send_group_message);
         mMessageView = findViewById(R.id.group_message_input);
 
-        mTextView = findViewById(R.id.group_conversation_text);
-        mScrollView = findViewById(R.id.group_scroll_view);
-
     }
 
     private void sendMessageToDatabase() {
@@ -160,29 +173,14 @@ public class GroupConversationActivity extends AppCompatActivity {
             mDatabaseRef.child("Groups").child(mGroupName).updateChildren(groupMessageMap);
 
             HashMap<String, Object> groupMessageDetail = new HashMap<>();
-                groupMessageDetail.put("Username", mUsername);
+                groupMessageDetail.put("UserID", mUserID);
                 groupMessageDetail.put("message", messageInput);
                 groupMessageDetail.put("Time", currentTime);
+                groupMessageDetail.put("type", "text");
             mDatabaseRef.child("Groups").child(mGroupName).child(messageKey).updateChildren(groupMessageDetail);
         }
 
         mMessageView.setText("");
-    }
-
-    private void displayMessages(DataSnapshot snapshot) {
-
-        Iterator ite = snapshot.getChildren().iterator();
-
-        while (ite.hasNext()){
-            String timeStamp = ((DataSnapshot)ite.next()).getValue().toString();
-            String userName = ((DataSnapshot)ite.next()).getValue().toString();
-            String message = ((DataSnapshot)ite.next()).getValue().toString();
-
-            mTextView.append(userName + ":\n" + message + "\n" + timeStamp + "\n\n\n");
-
-            mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-        }
-        return;
     }
 
 }
