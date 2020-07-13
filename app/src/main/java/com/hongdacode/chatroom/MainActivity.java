@@ -3,6 +3,7 @@ package com.hongdacode.chatroom;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -80,13 +81,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void isUserValid() {
-        String userID = mAuth.getCurrentUser().getUid();
+        final String userID = mAuth.getCurrentUser().getUid();
 
         mDatabaseRef.child("Users").child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if ((snapshot.child("Username").exists())) {
-                    Toast.makeText(MainActivity.this, "Welcome: " + snapshot.child("Username").toString(), Toast.LENGTH_SHORT);
+                    Toast.makeText(MainActivity.this, "Welcome " + snapshot.child("Username").getValue().toString(), Toast.LENGTH_SHORT).show();
                 } else {
                     sendToSettingsActivity();
                 }

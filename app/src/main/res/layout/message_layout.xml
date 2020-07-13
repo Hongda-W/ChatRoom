@@ -41,6 +41,17 @@
         android:textColor="@color/black"
         />
 
+    <ImageView
+        android:id="@+id/receiver_message_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_toEndOf="@id/message_profile_image"
+        android:layout_margin="5dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Image that user received in a chat"
+        />
+
+
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/sender_profile_image"
@@ -67,6 +78,16 @@
         android:padding="10dp"
         android:textStyle="bold"
         android:textColor="@color/black"
+        />
+
+    <ImageView
+        android:id="@+id/sender_message_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_toStartOf="@id/sender_profile_image"
+        android:layout_margin="5dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Image that user sent in a chat"
         />
 
         
