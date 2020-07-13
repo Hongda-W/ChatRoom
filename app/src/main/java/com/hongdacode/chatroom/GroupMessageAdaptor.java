@@ -79,6 +79,10 @@ public class GroupMessageAdaptor extends RecyclerView.Adapter<GroupMessageAdapto
 
                     Picasso.get().load(imageURL).placeholder(R.drawable.profile_default).into(holder.receiverProfileImage);
                 }
+                if (snapshot.hasChild("Username")){
+                    String username = snapshot.child("Username").getValue().toString();
+                    holder.receiverUsername.setText(username);
+                }
             }
 
             @Override
