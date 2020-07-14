@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
@@ -38,7 +39,7 @@ import java.util.UUID;
 public class ChatActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
-    private ImageButton mSendMessageButton;
+    private Button mSendMessageButton;
     private EditText mEditText;
 
     private DatabaseReference mDatabaseReference;
