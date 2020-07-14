@@ -191,6 +191,7 @@ public class GroupMessageAdaptor extends RecyclerView.Adapter<GroupMessageAdapto
                 holder.receiverMessageText.setTextColor(Color.BLACK);
                 holder.receiverMessageText.setText(message);
             } else if(fromMessageType.equals("image")){
+
                 holder.receiverMessageImage.getLayoutParams().height=400;
                 holder.receiverMessageImage.getLayoutParams().width=400;
 

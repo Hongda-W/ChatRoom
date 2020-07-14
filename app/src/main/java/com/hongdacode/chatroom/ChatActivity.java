@@ -409,7 +409,6 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("ChatRoom", "I am here");
         if (requestCode==438 && resultCode==RESULT_OK && data!=null && data.getData()!=null){
 
             mProgress.setTitle("Sending file");

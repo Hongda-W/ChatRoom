@@ -1,6 +1,7 @@
 package com.hongdacode.chatroom;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,7 +114,6 @@ public class MessageAdaptor extends RecyclerView.Adapter<MessageAdaptor.MessageV
         holder.receiverProfileImage.setVisibility(View.INVISIBLE);
         holder.receiverUsername.setVisibility(View.INVISIBLE);
         holder.receiverMessageText.setVisibility(View.INVISIBLE);
-        holder.receiverMessageImage.setVisibility(View.INVISIBLE);
         holder.senderProfileImage.setVisibility(View.INVISIBLE);
         holder.senderMessageText.setVisibility(View.INVISIBLE);
 
@@ -133,6 +133,7 @@ public class MessageAdaptor extends RecyclerView.Adapter<MessageAdaptor.MessageV
             }else if(fromMessageType.equals("image")){
                 holder.senderMessageImage.getLayoutParams().height=400;
                 holder.senderMessageImage.getLayoutParams().width=400;
+
 
                 Picasso.get().load(message).into(holder.senderMessageImage);
             } else if(fromMessageType.equals("docx")){
@@ -185,6 +186,7 @@ public class MessageAdaptor extends RecyclerView.Adapter<MessageAdaptor.MessageV
                 holder.receiverMessageImage.getLayoutParams().width=400;
 
                 Picasso.get().load(message).into(holder.receiverMessageImage);
+
             } else if(fromMessageType.equals("docx")){
                 holder.receiverMessageImage.getLayoutParams().height=300;
                 holder.receiverMessageImage.getLayoutParams().width=300;
