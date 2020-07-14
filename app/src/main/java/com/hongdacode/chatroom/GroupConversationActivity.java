@@ -74,7 +74,6 @@ public class GroupConversationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_group_conversation);
 
         mGroupName = getIntent().getStringExtra("GroupName");
-        Toast.makeText(GroupConversationActivity.this, mGroupName, Toast.LENGTH_SHORT).show();
 
         mMessageAdaptor = new GroupMessageAdaptor(mMessagesList);
         mRecyclerView = findViewById(R.id.group_conv_recycler_view);
@@ -85,7 +84,6 @@ public class GroupConversationActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUserID = mAuth.getCurrentUser().getUid();
 
-        mProgress = new ProgressDialog(this);
 
         loadViews();
 
@@ -112,7 +110,6 @@ public class GroupConversationActivity extends AppCompatActivity {
         mSendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO send file to chat
 
                 fileType="image";
                 Intent intent = new Intent();
@@ -126,7 +123,6 @@ public class GroupConversationActivity extends AppCompatActivity {
         mSendFileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO send file to chat
                 CharSequence options[] = new CharSequence[]{
                         "PDF File",
                         "DocX File",

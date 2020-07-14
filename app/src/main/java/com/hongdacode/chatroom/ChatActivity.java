@@ -2,11 +2,16 @@ package com.hongdacode.chatroom;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,6 +23,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +33,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,6 +61,11 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
 
     private String conversationID, myUserID, myUsername, theirUserID, currentTime;
+    private String fileType="";
+    private StorageTask uploadToFirebase;
+    private Uri fileUri;
+
+    private ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +87,8 @@ public class ChatActivity extends AppCompatActivity {
         myUserID = mAuth.getCurrentUser().getUid();
 
         theirUserID = getIntent().getStringExtra("theirUserID");
+
+        mProgress = new ProgressDialog(this);
 
         getUserInfo();
 
@@ -118,16 +134,100 @@ public class ChatActivity extends AppCompatActivity {
                 mSendFileButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        //TODO send file to chat
-                        Toast.makeText(ChatActivity.this, "You are sending files to chat", Toast.LENGTH_SHORT).show();
+                        CharSequence options[] = new CharSequence[]{
+                                "PDF File",
+                                "DocX File",
+                                "Excel File",
+                                "PPT File",
+                                "Audio File",
+                                "Video File",
+                                "Any File"
+                        };
+
+                        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ChatActivity.this);
+                        alertBuilder.setTitle("Select File");
+
+                        alertBuilder.setItems(options, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (i == 0){
+                                    fileType="pdf";
+
+                                    Intent intent = new Intent();
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    intent.setType("application/pdf");
+                                    intent.putExtra("convID", convID);
+                                    startActivityForResult(intent.createChooser(intent, "Select pdf"), 438);
+
+                                }
+                                if (i == 1){
+                                    fileType="docx";
+                                    Intent intent = new Intent();
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    intent.setType("application/msword");
+                                    intent.putExtra("convID", convID);
+                                    startActivityForResult(intent.createChooser(intent, "Select docx"), 438);
+                                }
+                                if (i == 2){
+                                    fileType="xlsx";
+                                    Intent intent = new Intent();
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    intent.setType("application/vnd.ms-excel");
+                                    intent.putExtra("convID", convID);
+                                    startActivityForResult(intent.createChooser(intent, "Select xlsx"), 438);
+                                }
+                                if (i == 3){
+                                    fileType="pptx";
+                                    Intent intent = new Intent();
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    intent.setType("application/vnd.ms-powerpoint");
+                                    intent.putExtra("convID", convID);
+                                    startActivityForResult(intent.createChooser(intent, "Select pptx"), 438);
+                                }
+
+                                if (i == 4){
+                                    fileType="audio";
+                                    Intent intent = new Intent();
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    intent.setType("audio/*");
+                                    intent.putExtra("convID", convID);
+                                    startActivityForResult(intent.createChooser(intent, "Select audio file"), 438);
+                                }
+
+                                if (i == 5){
+                                    fileType="video";
+                                    Intent intent = new Intent();
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    intent.setType("video/*");
+                                    intent.putExtra("convID", convID);
+                                    startActivityForResult(intent.createChooser(intent, "Select video file"), 438);
+                                }
+
+                                if (i == 6){
+                                    fileType="*";
+                                    Intent intent = new Intent();
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    intent.setType("*/*");
+                                    intent.putExtra("convID", convID);
+                                    startActivityForResult(intent.createChooser(intent, "Select any file"), 438);
+                                }
+
+
+                            }
+                        });
+                        alertBuilder.show();
                     }
                 });
 
                 mSendImageButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        //TODO send image to chat
-                        Toast.makeText(ChatActivity.this, "You are sending images to chat", Toast.LENGTH_SHORT).show();
+
+                        fileType="image";
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        intent.setType("image/*");
+                        startActivityForResult(intent.createChooser(intent, "Select Image"), 438);
                     }
                 });
 
@@ -172,11 +272,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         mDatabaseReference.child("ConversationIndex").child(myUserID).child(theirUserID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -222,7 +317,9 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
     }
+
 
     private void createChat(final String myUserID, final String theirUserID) {
         conversationID = createTransactionID();
@@ -275,10 +372,21 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendMessageToDatabase(String convID) {
+
         String messageInput = mEditText.getText().toString();
+
         String messageKey = mDatabaseReference.child("Conversations").child(convID).push().getKey();
 
-        if (messageInput.equals("")){
+
+        sendChatToDatabase(convID, messageInput, "text", messageKey);
+
+        mEditText.setText("");
+    }
+
+    private void sendChatToDatabase(String convID, String message, String type, String messageKey) {
+
+
+        if (message.equals("")){
             Toast.makeText(this, "Please enter you message", Toast.LENGTH_SHORT).show();
         } else{
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM dd, hh:mm:ss.SSS");
@@ -289,13 +397,76 @@ public class ChatActivity extends AppCompatActivity {
 
             HashMap<String, Object> messageDetail = new HashMap<>();
             messageDetail.put("UserID", myUserID);
-            messageDetail.put("message", messageInput);
+            messageDetail.put("message", message);
             messageDetail.put("Time", currentTime);
-            messageDetail.put("type", "text");
+            messageDetail.put("type", type);
             mDatabaseReference.child("Conversations").child(convID).child(messageKey).updateChildren(messageDetail);
         }
 
         mEditText.setText("");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("ChatRoom", "I am here");
+        if (requestCode==438 && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+
+            mProgress.setTitle("Sending file");
+            mProgress.setMessage("Please wait, file is being sent...");
+            mProgress.setCanceledOnTouchOutside(true);
+            mProgress.show();
+
+            mDatabaseReference.child("ConversationIndex").child(myUserID).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    final String convID;
+                    if (snapshot.exists() && snapshot.hasChild(theirUserID) &&
+                            snapshot.child(theirUserID).hasChild("id") ){
+
+                        fileUri = data.getData();
+
+                        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("ChatFiles");
+                        final StorageReference fileUploaded;
+                        convID = snapshot.child(theirUserID).child("id").getValue().toString();
+                        final String messageKey = mDatabaseReference.child("Conversations").child(convID).push().getKey();
+                        fileUploaded = storageReference.child(messageKey + "_" + fileType);
+                        uploadToFirebase = fileUploaded.putFile(fileUri);
+                        uploadToFirebase.continueWithTask(new Continuation() {
+                            @Override
+                            public Object then(@NonNull Task task) throws Exception {
+
+                                if (!task.isSuccessful()){
+                                    throw task.getException();
+                                }
+                                return fileUploaded.getDownloadUrl();
+                            }
+                        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                if (task.isSuccessful()){
+                                    Uri imageUri = (Uri) task.getResult();
+
+                                    if (imageUri != null){
+                                        String imageURL = imageUri.toString();
+
+                                        sendChatToDatabase(convID, imageURL, fileType, messageKey);
+                                        mProgress.dismiss();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+        }
     }
 
 }

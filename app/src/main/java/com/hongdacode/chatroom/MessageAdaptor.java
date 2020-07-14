@@ -114,46 +114,116 @@ public class MessageAdaptor extends RecyclerView.Adapter<MessageAdaptor.MessageV
         holder.receiverUsername.setVisibility(View.INVISIBLE);
         holder.receiverMessageText.setVisibility(View.INVISIBLE);
         holder.receiverMessageImage.setVisibility(View.INVISIBLE);
-
         holder.senderProfileImage.setVisibility(View.INVISIBLE);
         holder.senderMessageText.setVisibility(View.INVISIBLE);
-        holder.senderMessageImage.setVisibility(View.INVISIBLE);
+
+        holder.senderMessageImage.getLayoutParams().height=0;
+        holder.senderMessageImage.getLayoutParams().width=0;
+        holder.receiverMessageImage.getLayoutParams().height=0;
+        holder.receiverMessageImage.getLayoutParams().width=0;
+
 
         if (messageFromID.equals(senderID)){
             holder.senderProfileImage.setVisibility(View.VISIBLE);
             if (fromMessageType.equals("text")){
-                holder.senderMessageImage.getLayoutParams().height=0;
-                holder.senderMessageImage.getLayoutParams().width=0;
-                holder.receiverMessageImage.getLayoutParams().height=0;
-                holder.receiverMessageImage.getLayoutParams().width=0;
-
                 holder.senderMessageText.setVisibility(View.VISIBLE);
                 holder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
                 holder.senderMessageText.setTextColor(Color.BLACK);
                 holder.senderMessageText.setText(message);
             }else if(fromMessageType.equals("image")){
-                holder.senderMessageImage.setVisibility(View.VISIBLE);
-                // TODO Display image message here
+                holder.senderMessageImage.getLayoutParams().height=400;
+                holder.senderMessageImage.getLayoutParams().width=400;
+
+                Picasso.get().load(message).into(holder.senderMessageImage);
+            } else if(fromMessageType.equals("docx")){
+                holder.senderMessageImage.getLayoutParams().height=300;
+                holder.senderMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.docx_icon).into(holder.senderMessageImage);
+            } else if(fromMessageType.equals("pdf")){
+                holder.senderMessageImage.getLayoutParams().height=300;
+                holder.senderMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.pdf_icon).into(holder.senderMessageImage);
+            } else if(fromMessageType.equals("xlsx")){
+                holder.senderMessageImage.getLayoutParams().height=300;
+                holder.senderMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.xlsx_icon).into(holder.senderMessageImage);
+            } else if(fromMessageType.equals("pptx")){
+                holder.senderMessageImage.getLayoutParams().height=300;
+                holder.senderMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.pptx_icon).into(holder.senderMessageImage);
+            } else if(fromMessageType.equals("audio")){
+                holder.senderMessageImage.getLayoutParams().height=300;
+                holder.senderMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.audio_icon).into(holder.senderMessageImage);
+            } else if(fromMessageType.equals("video")){
+                holder.senderMessageImage.getLayoutParams().height=300;
+                holder.senderMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.vedio_icon).into(holder.senderMessageImage);
+            } else if(fromMessageType.equals("*")){
+                holder.senderMessageImage.getLayoutParams().height=300;
+                holder.senderMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.unknown_icon).into(holder.senderMessageImage);
             }
-            holder.senderProfileImage.setVisibility(View.VISIBLE);
         } else{
             holder.receiverProfileImage.setVisibility(View.VISIBLE);
+            holder.receiverUsername.setVisibility(View.VISIBLE);
             if (fromMessageType.equals("text")){
-                holder.senderMessageImage.getLayoutParams().height=0;
-                holder.senderMessageImage.getLayoutParams().width=0;
-                holder.receiverMessageImage.getLayoutParams().height=0;
-                holder.receiverMessageImage.getLayoutParams().width=0;
 
                 holder.receiverMessageText.setVisibility(View.VISIBLE);
                 holder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
                 holder.receiverMessageText.setTextColor(Color.BLACK);
                 holder.receiverMessageText.setText(message);
             } else if(fromMessageType.equals("image")){
-                holder.receiverMessageImage.setVisibility(View.VISIBLE);
-                // TODO Display image message here
+                holder.receiverMessageImage.getLayoutParams().height=400;
+                holder.receiverMessageImage.getLayoutParams().width=400;
+
+                Picasso.get().load(message).into(holder.receiverMessageImage);
+            } else if(fromMessageType.equals("docx")){
+                holder.receiverMessageImage.getLayoutParams().height=300;
+                holder.receiverMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.docx_icon).into(holder.receiverMessageImage);
+            } else if(fromMessageType.equals("xlsx")){
+                holder.receiverMessageImage.getLayoutParams().height=300;
+                holder.receiverMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.xlsx_icon).into(holder.receiverMessageImage);
+            } else if(fromMessageType.equals("pdf")){
+                holder.receiverMessageImage.getLayoutParams().height=300;
+                holder.receiverMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.pdf_icon).into(holder.receiverMessageImage);
+            } else if(fromMessageType.equals("pptx")){
+                holder.receiverMessageImage.getLayoutParams().height=300;
+                holder.receiverMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.pptx_icon).into(holder.receiverMessageImage);
+            } else if(fromMessageType.equals("audio")){
+                holder.receiverMessageImage.getLayoutParams().height=300;
+                holder.receiverMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.audio_icon).into(holder.receiverMessageImage);
+            } else if(fromMessageType.equals("video")){
+                holder.receiverMessageImage.getLayoutParams().height=300;
+                holder.receiverMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.vedio_icon).into(holder.receiverMessageImage);
+            }else if(fromMessageType.equals("*")){
+                holder.receiverMessageImage.getLayoutParams().height=300;
+                holder.receiverMessageImage.getLayoutParams().width=300;
+
+                Picasso.get().load("invalid").placeholder(R.drawable.unknown_icon).into(holder.receiverMessageImage);
             }
 
         }
+
     }
 
 
