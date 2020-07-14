@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -294,6 +295,26 @@ public class UserProfileActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()){
                                                 mDatabaseRef.child("Contacts").child(userID).child(myUserID).removeValue();
+                                                mDatabaseRef.child("ConversationIndex").child(userID).child(myUserID).addValueEventListener(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                        if(snapshot.exists()){
+                                                            String convID = snapshot.child("id").getValue().toString();
+
+                                                            mDatabaseRef.child("Conversations").child(convID).removeValue(); // remove conversations between the two.
+                                                            FirebaseStorage.getInstance().getReference().child(convID+"_ChatFiles").delete();
+                                                            // The firebase storage will not be deleted.
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                                    }
+                                                });
+
+                                                mDatabaseRef.child("ConversationIndex").child(userID).child(myUserID).removeValue();
+                                                mDatabaseRef.child("ConversationIndex").child(myUserID).child(userID).removeValue();
                                                 Toast.makeText(UserProfileActivity.this, "Friend removed.", Toast.LENGTH_SHORT).show();
                                                 sendToMainActivity();
                                             }

@@ -425,9 +425,11 @@ public class ChatActivity extends AppCompatActivity {
 
                         fileUri = data.getData();
 
-                        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("ChatFiles");
-                        final StorageReference fileUploaded;
                         convID = snapshot.child(theirUserID).child("id").getValue().toString();
+                        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(convID+"_ChatFiles");
+
+                        final StorageReference fileUploaded;
+
                         final String messageKey = mDatabaseReference.child("Conversations").child(convID).push().getKey();
                         fileUploaded = storageReference.child(messageKey + "_" + fileType);
                         uploadToFirebase = fileUploaded.putFile(fileUri);

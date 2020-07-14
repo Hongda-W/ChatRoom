@@ -45,6 +45,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 public class GroupConversationActivity extends AppCompatActivity {
 
@@ -90,6 +91,7 @@ public class GroupConversationActivity extends AppCompatActivity {
         getUserInfo();
 
 
+        mProgress = new ProgressDialog(this);
 
         mSendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,13 +207,15 @@ public class GroupConversationActivity extends AppCompatActivity {
         mDatabaseRef.child("Groups").child(mGroupName).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Messages message = snapshot.getValue(Messages.class);
+                if (snapshot.exists() && snapshot.hasChild("UserID")){
+                    Messages message = snapshot.getValue(Messages.class);
 
-                mMessagesList.add(message);
+                    mMessagesList.add(message);
 
-                mMessageAdaptor.notifyDataSetChanged();
+                    mMessageAdaptor.notifyDataSetChanged();
 
-                mRecyclerView.smoothScrollToPosition(mRecyclerView.getAdapter().getItemCount());
+                    mRecyclerView.smoothScrollToPosition(mRecyclerView.getAdapter().getItemCount());
+                }
             }
 
             @Override
@@ -310,36 +314,89 @@ public class GroupConversationActivity extends AppCompatActivity {
 
             fileUri = data.getData();
 
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("ChatFiles");
-            final StorageReference fileUploaded;
-
-            final String messageKey = mDatabaseRef.child("Groups").child(mGroupName).push().getKey();
-
-
-            fileUploaded = storageReference.child(messageKey + "_" + fileType);
-            uploadToFirebase = fileUploaded.putFile(fileUri);
-            uploadToFirebase.continueWithTask(new Continuation() {
+            mDatabaseRef.child("Groups").child(mGroupName).child("StorageID").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public Object then(@NonNull Task task) throws Exception {
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()){
+                        final String storageID = snapshot.getValue().toString();
 
-                    if (!task.isSuccessful()){
-                        throw task.getException();
+                        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(storageID);
+                        final StorageReference fileUploaded;
+
+                        final String messageKey = mDatabaseRef.child("Groups").child(mGroupName).push().getKey();
+
+
+                        fileUploaded = storageReference.child(messageKey + "_" + fileType);
+                        uploadToFirebase = fileUploaded.putFile(fileUri);
+                        uploadToFirebase.continueWithTask(new Continuation() {
+                            @Override
+                            public Object then(@NonNull Task task) throws Exception {
+
+                                if (!task.isSuccessful()){
+                                    throw task.getException();
+                                }
+                                return fileUploaded.getDownloadUrl();
+                            }
+                        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                if (task.isSuccessful()){
+                                    Uri imageUri = (Uri) task.getResult();
+
+                                    if (imageUri != null){
+                                        String imageURL = imageUri.toString();
+
+                                        sendChatToDatabase(imageURL, fileType, messageKey);
+                                        mProgress.dismiss();
+                                    }
+                                }
+                            }
+                        });
+
+                    }else {
+                        final String storageID = UUID.randomUUID().toString().replaceAll("-", "").toLowerCase()+"GroupFiles";
+
+                        mDatabaseRef.child("Groups").child(mGroupName).child("StorageID").setValue(storageID);
+
+                        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(storageID);
+                        final StorageReference fileUploaded;
+
+                        final String messageKey = mDatabaseRef.child("Groups").child(mGroupName).push().getKey();
+
+
+                        fileUploaded = storageReference.child(messageKey + "_" + fileType);
+                        uploadToFirebase = fileUploaded.putFile(fileUri);
+                        uploadToFirebase.continueWithTask(new Continuation() {
+                            @Override
+                            public Object then(@NonNull Task task) throws Exception {
+
+                                if (!task.isSuccessful()){
+                                    throw task.getException();
+                                }
+                                return fileUploaded.getDownloadUrl();
+                            }
+                        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                if (task.isSuccessful()){
+                                    Uri imageUri = (Uri) task.getResult();
+
+                                    if (imageUri != null){
+                                        String imageURL = imageUri.toString();
+
+                                        sendChatToDatabase(imageURL, fileType, messageKey);
+                                        mProgress.dismiss();
+                                    }
+                                }
+                            }
+                        });
+
                     }
-                    return fileUploaded.getDownloadUrl();
                 }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+
                 @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()){
-                        Uri imageUri = (Uri) task.getResult();
+                public void onCancelled(@NonNull DatabaseError error) {
 
-                        if (imageUri != null){
-                            String imageURL = imageUri.toString();
-
-                            sendChatToDatabase(imageURL, fileType, messageKey);
-                            mProgress.dismiss();
-                        }
-                    }
                 }
             });
 
