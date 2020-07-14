@@ -174,7 +174,6 @@ public class MessageAdaptor extends RecyclerView.Adapter<MessageAdaptor.MessageV
             }
         } else{
             holder.receiverProfileImage.setVisibility(View.VISIBLE);
-            holder.receiverUsername.setVisibility(View.VISIBLE);
             if (fromMessageType.equals("text")){
 
                 holder.receiverMessageText.setVisibility(View.VISIBLE);
