@@ -40,6 +40,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private Button mSendMessageButton;
+    private ImageButton mSendImageButton, mSendFileButton;
     private EditText mEditText;
 
     private DatabaseReference mDatabaseReference;
@@ -111,6 +112,22 @@ public class ChatActivity extends AppCompatActivity {
                     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                         sendMessageToDatabase(convID);
                         return true;
+                    }
+                });
+
+                mSendFileButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //TODO send file to chat
+                        Toast.makeText(ChatActivity.this, "You are sending files to chat", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                mSendImageButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //TODO send image to chat
+                        Toast.makeText(ChatActivity.this, "You are sending images to chat", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -234,7 +251,10 @@ public class ChatActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
 
         mSendMessageButton = findViewById(R.id.send_chat_message);
+        mSendImageButton = findViewById(R.id.send_chat_image);
+        mSendFileButton = findViewById(R.id.send_chat_file);
         mEditText = findViewById(R.id.chat_message_input);
+
 
     }
 

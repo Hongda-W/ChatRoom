@@ -2,11 +2,16 @@ package com.hongdacode.chatroom;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,6 +23,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -25,6 +33,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
 import java.security.acl.Group;
 import java.text.SimpleDateFormat;
@@ -50,6 +62,11 @@ public class GroupConversationActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
 
     private String mGroupName, mUserID, mUsername, currentTime;
+    private String fileType="", url;
+    private StorageTask uploadToFirebase;
+    private Uri fileUri;
+
+    private ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +84,8 @@ public class GroupConversationActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mUserID = mAuth.getCurrentUser().getUid();
+
+        mProgress = new ProgressDialog(this);
 
         loadViews();
 
@@ -89,13 +108,103 @@ public class GroupConversationActivity extends AppCompatActivity {
                 return true;
             }
         });
-    }
 
-    @Override
-    protected void onStart() {
+        mSendImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO send file to chat
 
-        super.onStart();
+                fileType="image";
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent.createChooser(intent, "Select Image"), 438);
+            }
+        });
 
+
+        mSendFileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO send file to chat
+                CharSequence options[] = new CharSequence[]{
+                        "PDF File",
+                        "DocX File",
+                        "Excel File",
+                        "PPT File",
+                        "Audio File",
+                        "Video File",
+                        "Any File"
+                };
+
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(GroupConversationActivity.this);
+                alertBuilder.setTitle("Select File");
+
+                alertBuilder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (i == 0){
+                            fileType="pdf";
+
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            intent.setType("application/pdf");
+                            startActivityForResult(intent.createChooser(intent, "Select pdf"), 438);
+
+                            Toast.makeText(GroupConversationActivity.this, "You should select pdf", Toast.LENGTH_SHORT).show();
+                        }
+                        if (i == 1){
+                            fileType="docx";
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            intent.setType("application/msword");
+                            startActivityForResult(intent.createChooser(intent, "Select docx"), 438);
+                        }
+                        if (i == 2){
+                            fileType="xlsx";
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            intent.setType("application/vnd.ms-excel");
+                            startActivityForResult(intent.createChooser(intent, "Select xlsx"), 438);
+                        }
+                        if (i == 3){
+                            fileType="pptx";
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            intent.setType("application/vnd.ms-powerpoint");
+                            startActivityForResult(intent.createChooser(intent, "Select pptx"), 438);
+                        }
+
+                        if (i == 4){
+                            fileType="audio";
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            intent.setType("audio/*");
+                            startActivityForResult(intent.createChooser(intent, "Select audio file"), 438);
+                        }
+
+                        if (i == 5){
+                            fileType="video";
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            intent.setType("video/*");
+                            startActivityForResult(intent.createChooser(intent, "Select video file"), 438);
+                        }
+
+                        if (i == 6){
+                            fileType="*";
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            intent.setType("*/*");
+                            startActivityForResult(intent.createChooser(intent, "Select any file"), 438);
+                        }
+
+
+                    }
+                });
+                alertBuilder.show();
+            }
+        });
 
         mDatabaseRef.child("Groups").child(mGroupName).addChildEventListener(new ChildEventListener() {
             @Override
@@ -129,7 +238,6 @@ public class GroupConversationActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
 
@@ -156,6 +264,8 @@ public class GroupConversationActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(mGroupName);
 
         mSendMessageButton = findViewById(R.id.send_group_message);
+        mSendFileButton = findViewById(R.id.send_group_file);
+        mSendImageButton = findViewById(R.id.send_group_image);
         mMessageView = findViewById(R.id.group_message_input);
 
     }
@@ -165,7 +275,13 @@ public class GroupConversationActivity extends AppCompatActivity {
         String messageInput = mMessageView.getText().toString();
         String messageKey = mDatabaseRef.child("Groups").child(mGroupName).push().getKey();
 
-        if (messageInput.equals("")){
+        sendChatToDatabase(messageInput, "text", messageKey);
+
+        mMessageView.setText("");
+    }
+
+    private void sendChatToDatabase(String message, String type, String messageKey){
+        if (message.equals("")){
             Toast.makeText(this, "Please enter you message", Toast.LENGTH_SHORT).show();
         } else{
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM dd, hh:mm:ss.SSS");
@@ -175,14 +291,62 @@ public class GroupConversationActivity extends AppCompatActivity {
             mDatabaseRef.child("Groups").child(mGroupName).updateChildren(groupMessageMap);
 
             HashMap<String, Object> groupMessageDetail = new HashMap<>();
-                groupMessageDetail.put("UserID", mUserID);
-                groupMessageDetail.put("message", messageInput);
-                groupMessageDetail.put("Time", currentTime);
-                groupMessageDetail.put("type", "text");
+            groupMessageDetail.put("UserID", mUserID);
+            groupMessageDetail.put("message", message);
+            groupMessageDetail.put("Time", currentTime);
+            groupMessageDetail.put("type", type);
             mDatabaseRef.child("Groups").child(mGroupName).child(messageKey).updateChildren(groupMessageDetail);
         }
 
-        mMessageView.setText("");
+
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode==438 && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+
+            mProgress.setTitle("Sending file");
+            mProgress.setMessage("Please wait, file is being sent...");
+            mProgress.setCanceledOnTouchOutside(true);
+            mProgress.show();
+
+            fileUri = data.getData();
+
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("ChatFiles");
+            final StorageReference fileUploaded;
+
+            final String messageKey = mDatabaseRef.child("Groups").child(mGroupName).push().getKey();
+
+
+            fileUploaded = storageReference.child(messageKey + "_" + fileType);
+            uploadToFirebase = fileUploaded.putFile(fileUri);
+            uploadToFirebase.continueWithTask(new Continuation() {
+                @Override
+                public Object then(@NonNull Task task) throws Exception {
+
+                    if (!task.isSuccessful()){
+                        throw task.getException();
+                    }
+                    return fileUploaded.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()){
+                        Uri imageUri = (Uri) task.getResult();
+
+                        if (imageUri != null){
+                            String imageURL = imageUri.toString();
+
+                            sendChatToDatabase(imageURL, fileType, messageKey);
+                            mProgress.dismiss();
+                        }
+                    }
+                }
+            });
+
+        }
+    }
 }
